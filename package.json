@@ -1,8 +1,9 @@
 {
 	"name": "@foomo/next-proxy-middleware",
-	"module": "dist/index.js",
 	"version": "1.0.3",
+	"license": "MIT",
 	"type": "module",
+	"module": "dist/index.js",
 	"scripts": {
 		"build": "tsc",
 		"lint": "biome check ./",

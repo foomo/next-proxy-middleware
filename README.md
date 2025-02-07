@@ -1,3 +1,5 @@
+![npm](https://img.shields.io/npm/dm/@foomo/next-proxy-middleware.svg?style=flat-square)
+![npm](https://img.shields.io/npm/l/@foomo/next-proxy-middleware.svg?style=flat-square)
 [![Build Status](https://github.com/foomo/next-proxy-middleware/actions/workflows/test.yml/badge.svg?branch=main&event=push)](https://github.com/foomo/next-proxy-middleware/actions/workflows/test.yml)
 
 # @foomo/next-proxy-middleware
