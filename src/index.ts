@@ -1,4 +1,3 @@
-import { headers } from "next/headers";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
@@ -45,7 +44,7 @@ export type DevProxyConfig = {
  */
 export const createProxyMiddleware = (config: DevProxyConfig) => {
 	if (config.debug) {
-		console.log("[PROXY]", "starting proxy with config", config);
+		console.debug("[PROXY]", "starting proxy with config", config);
 	}
 
 	if (config.remoteUrl === undefined) {
@@ -93,7 +92,7 @@ export const createProxyMiddleware = (config: DevProxyConfig) => {
 		});
 
 		if (config.debug) {
-			console.log("[PROXY]", "received response from remote", {
+			console.debug("[PROXY]", "received response from remote", {
 				// biome-ignore lint/suspicious/noExplicitAny: inconsistency in TS
 				headers: Object.fromEntries(backendResponse.headers as any),
 			});
@@ -105,7 +104,7 @@ export const createProxyMiddleware = (config: DevProxyConfig) => {
 			if (setCookieHeaders) {
 				try {
 					if (config.debug) {
-						console.log("[PROXY]", "setCookieHeaders", setCookieHeaders);
+						console.debug("[PROXY]", "setCookieHeaders", setCookieHeaders);
 					}
 					// const origin = new URL(request.headers.get("host") ?? "");
 					const rewrittenCookies = setCookieHeaders.split(",").map((cookie) => {
@@ -114,7 +113,7 @@ export const createProxyMiddleware = (config: DevProxyConfig) => {
 					});
 
 					if (config.debug) {
-						console.log("[PROXY]", "rewrittenCookies", rewrittenCookies);
+						console.debug("[PROXY]", "rewrittenCookies", rewrittenCookies);
 					}
 					remoteHeaders.set("set-cookie", rewrittenCookies.join(","));
 				} catch (e) {
@@ -123,12 +122,10 @@ export const createProxyMiddleware = (config: DevProxyConfig) => {
 			}
 		}
 
-		const response = new NextResponse(backendResponse.body, {
+		return new NextResponse(backendResponse.body, {
 			...backendResponse,
 			headers: responseHeaders,
 			status: backendResponse.status,
 		});
-
-		return response;
 	};
 };

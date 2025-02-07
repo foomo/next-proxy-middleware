@@ -1,0 +1,36 @@
+name: Test Branch
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+  merge_group:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: package.json
+
+      - name: Run install
+        run: |
+          bun install
+          git diff --exit-code
+
+      - name: Run lint
+        run: bun run lint
+
+      - name: Run type check
+        run: bun run type-check
+
+      #- name: Run test
+      #  run: bun test

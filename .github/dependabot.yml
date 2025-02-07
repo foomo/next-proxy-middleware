@@ -1,0 +1,25 @@
+version: 2
+
+updates:
+  - package-ecosystem: 'github-actions'
+    directory: '/'
+    schedule:
+      day: 'sunday'
+      interval: 'weekly'
+    groups:
+      github-actions:
+       patterns: ['*']
+
+  # https://github.com/dependabot/dependabot-core/issues/6528
+  #- package-ecosystem: npm
+  #  directory: '/'
+  #  schedule:
+  #    day: sunday
+  #    interval: weekly
+  #  groups:
+  #    npm-security:
+  #      applies-to: security-updates
+  #      patterns: ['*']
+  #    npm-update:
+  #      applies-to: version-updates
+  #      patterns: ['*']

@@ -1,3 +1,5 @@
+[![Build Status](https://github.com/foomo/next-proxy-middleware/actions/workflows/test.yml/badge.svg?branch=main&event=push)](https://github.com/foomo/next-proxy-middleware/actions/workflows/test.yml)
+
 # @foomo/next-proxy-middleware
 
 A Next.js middleware for proxying requests to external services with advanced configuration options.
@@ -79,4 +81,6 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 ## License
 
-MIT License
+Distributed under MIT License, please see license file within the code for more details.
+
+_Made with ♥ [foomo](https://www.foomo.org) by [bestbytes](https://www.bestbytes.com)_
