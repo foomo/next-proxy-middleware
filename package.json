@@ -32,5 +32,8 @@
 		"next": "15",
 		"typescript": "5"
 	},
-	"packageManager": "bun@1.2.2"
+	"packageManager": "bun@1.2.2",
+	"volta": {
+		"node": "22.13.1"
+	}
 }
