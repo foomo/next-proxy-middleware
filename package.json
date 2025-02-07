@@ -7,6 +7,9 @@
 		"build": "tsc",
 		"publish": "bun publish --access public"
 	},
+	"publishConfig": {
+		"tag": "next"
+	},
 	"devDependencies": {
 		"@types/bun": "latest"
 	},
