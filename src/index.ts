@@ -94,7 +94,8 @@ export const createProxyMiddleware = (config: DevProxyConfig) => {
 
 		if (config.debug) {
 			console.log("[PROXY]", "received response from remote", {
-				headers: Object.fromEntries(backendResponse.headers as unknown),
+				// biome-ignore lint/suspicious/noExplicitAny: inconsistency in TS
+				headers: Object.fromEntries(backendResponse.headers as any),
 			});
 		}
 

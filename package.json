@@ -5,7 +5,7 @@
 	"type": "module",
 	"scripts": {
 		"build": "tsc",
-		"publish": "bun publish --access public"
+		"publish": "bun run build && bun publish --access public"
 	},
 	"publishConfig": {
 		"tag": "next"
