@@ -1,7 +1,7 @@
 {
 	"name": "@foomo/next-proxy-middleware",
-	"module": "src/index.ts",
-	"version": "1.0.0",
+	"module": "dist/index.js",
+	"version": "1.0.3",
 	"type": "module",
 	"scripts": {
 		"build": "tsc",
@@ -12,12 +12,15 @@
 		"publish": "bun run build && bun publish --access public"
 	},
 	"publishConfig": {
+		"access": "public",
 		"tag": "next"
 	},
 	"types": "dist/index.d.ts",
+	"files": ["dist"],
 	"exports": {
 		".": {
-			"import": "./src/index.ts",
+			"import": "./dist/index.js",
+			"types": "./dist/index.d.ts",
 			"require": "./dist/index.js"
 		}
 	},
