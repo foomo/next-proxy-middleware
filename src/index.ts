@@ -84,48 +84,90 @@ export const createProxyMiddleware = (config: DevProxyConfig) => {
 			);
 		}
 
-		// Fetch the response from the backend
-		const backendResponse = await fetch(remoteUrl.href, {
-			method: request.method,
-			headers: remoteHeaders,
-			body: request.body,
-		});
-
+		// Log debug info before fetch
 		if (config.debug) {
-			console.debug("[PROXY]", "received response from remote", {
-				// biome-ignore lint/suspicious/noExplicitAny: inconsistency in TS
-				headers: Object.fromEntries(backendResponse.headers as any),
+			console.debug("[PROXY]", "Preparing fetch request:", {
+				url: remoteUrl.href,
+				method: request.method,
+				headers: Object.fromEntries(remoteHeaders as any),
+				hasBody: request.body !== null
 			});
 		}
 
-		const responseHeaders = new Headers(backendResponse.headers);
-		if (config.overrideCookieDomain) {
-			const setCookieHeaders = backendResponse.headers.get("set-cookie");
-			if (setCookieHeaders) {
-				try {
-					if (config.debug) {
-						console.debug("[PROXY]", "setCookieHeaders", setCookieHeaders);
-					}
-					// const origin = new URL(request.headers.get("host") ?? "");
-					const rewrittenCookies = setCookieHeaders.split(",").map((cookie) => {
-						const [cookiePair] = cookie.split(";").map((part) => part.trim());
-						return `${cookiePair}; Path=/; SameSite=None; Secure; Domain=${config.overrideCookieDomain}`;
-					});
+		// Fetch the response from the backend
+		try {
+			const backendResponse = await fetch(remoteUrl.href, {
+				method: request.method,
+				headers: remoteHeaders,
+				body: request.body,
+			});
 
-					if (config.debug) {
-						console.debug("[PROXY]", "rewrittenCookies", rewrittenCookies);
+			if (config.debug) {
+				console.debug("[PROXY]", "received response from remote", {
+					// biome-ignore lint/suspicious/noExplicitAny: inconsistency in TS
+					headers: Object.fromEntries(backendResponse.headers as any),
+				});
+			}
+
+			const responseHeaders = new Headers(backendResponse.headers);
+			if (config.overrideCookieDomain) {
+				const setCookieHeaders = backendResponse.headers.get("set-cookie");
+				if (setCookieHeaders) {
+					try {
+						if (config.debug) {
+							console.debug("[PROXY]", "setCookieHeaders", setCookieHeaders);
+						}
+						// const origin = new URL(request.headers.get("host") ?? "");
+						const rewrittenCookies = setCookieHeaders.split(",").map((cookie) => {
+							const [cookiePair] = cookie.split(";").map((part) => part.trim());
+							return `${cookiePair}; Path=/; SameSite=None; Secure; Domain=${config.overrideCookieDomain}`;
+						});
+
+						if (config.debug) {
+							console.debug("[PROXY]", "rewrittenCookies", rewrittenCookies);
+						}
+						remoteHeaders.set("set-cookie", rewrittenCookies.join(","));
+					} catch (e) {
+						console.error("Error setting cookies", e);
 					}
-					remoteHeaders.set("set-cookie", rewrittenCookies.join(","));
-				} catch (e) {
-					console.error("Error setting cookies", e);
 				}
 			}
-		}
 
-		return new NextResponse(backendResponse.body, {
-			...backendResponse,
-			headers: responseHeaders,
-			status: backendResponse.status,
-		});
-	};
+			return new NextResponse(backendResponse.body, {
+				...backendResponse,
+				headers: responseHeaders,
+				status: backendResponse.status,
+			});
+
+		} catch (error) {
+			console.error("[PROXY]", "Error during proxy request:", {
+				error: error instanceof Error ? {
+					message: error.message,
+					name: error.name,
+					stack: error.stack,
+					cause: error.cause
+				} : error,
+				url: remoteUrl.href,
+				method: request.method,
+				headers: Object.fromEntries(remoteHeaders as any)
+			});
+			
+			// Return error response to client
+			return new NextResponse(
+				JSON.stringify({
+					error: "Proxy request failed",
+					message: error instanceof Error ? error.message : "Unknown error",
+					url: remoteUrl.href
+				}),
+				{
+					status: 502,
+					headers: {
+						"Content-Type": "application/json"
+					}
+				}
+			);
+		}
+	}
+
+
 };

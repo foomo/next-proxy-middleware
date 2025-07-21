@@ -1,8 +1,9 @@
 {
 	"name": "@foomo/next-proxy-middleware",
-	"version": "1.0.3",
+	"version": "1.0.6",
 	"license": "MIT",
 	"type": "module",
+	"keywords": ["foomo", "next"],
 	"module": "dist/index.js",
 	"scripts": {
 		"build": "tsc",
@@ -13,8 +14,7 @@
 		"publish": "bun run build && bun publish --access public"
 	},
 	"publishConfig": {
-		"access": "public",
-		"tag": "next"
+		"access": "public"
 	},
 	"types": "dist/index.d.ts",
 	"files": ["dist"],
