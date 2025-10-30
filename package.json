@@ -3,7 +3,10 @@
 	"version": "1.0.6",
 	"license": "MIT",
 	"type": "module",
-	"keywords": ["foomo", "next"],
+	"keywords": [
+		"foomo",
+		"next"
+	],
 	"module": "dist/index.js",
 	"scripts": {
 		"build": "tsc",
@@ -17,7 +20,9 @@
 		"access": "public"
 	},
 	"types": "dist/index.d.ts",
-	"files": ["dist"],
+	"files": [
+		"dist"
+	],
 	"exports": {
 		".": {
 			"import": "./dist/index.js",
