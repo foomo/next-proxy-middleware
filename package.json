@@ -27,8 +27,8 @@
 	},
 	"devDependencies": {},
 	"peerDependencies": {
-		"next": "15",
-		"typescript": "5"
+		"next": ">=15",
+		"typescript": ">=5"
 	},
 	"packageManager": "bun@1.3.1"
 }
