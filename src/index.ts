@@ -90,7 +90,7 @@ export const createProxyMiddleware = (config: DevProxyConfig) => {
 				url: remoteUrl.href,
 				method: request.method,
 				headers: Object.fromEntries(remoteHeaders as any),
-				hasBody: request.body !== null
+				hasBody: request.body !== null,
 			});
 		}
 
@@ -104,7 +104,6 @@ export const createProxyMiddleware = (config: DevProxyConfig) => {
 
 			if (config.debug) {
 				console.debug("[PROXY]", "received response from remote", {
-					// biome-ignore lint/suspicious/noExplicitAny: inconsistency in TS
 					headers: Object.fromEntries(backendResponse.headers as any),
 				});
 			}
@@ -118,10 +117,14 @@ export const createProxyMiddleware = (config: DevProxyConfig) => {
 							console.debug("[PROXY]", "setCookieHeaders", setCookieHeaders);
 						}
 						// const origin = new URL(request.headers.get("host") ?? "");
-						const rewrittenCookies = setCookieHeaders.split(",").map((cookie) => {
-							const [cookiePair] = cookie.split(";").map((part) => part.trim());
-							return `${cookiePair}; Path=/; SameSite=None; Secure; Domain=${config.overrideCookieDomain}`;
-						});
+						const rewrittenCookies = setCookieHeaders
+							.split(",")
+							.map((cookie) => {
+								const [cookiePair] = cookie
+									.split(";")
+									.map((part) => part.trim());
+								return `${cookiePair}; Path=/; SameSite=None; Secure; Domain=${config.overrideCookieDomain}`;
+							});
 
 						if (config.debug) {
 							console.debug("[PROXY]", "rewrittenCookies", rewrittenCookies);
@@ -138,36 +141,36 @@ export const createProxyMiddleware = (config: DevProxyConfig) => {
 				headers: responseHeaders,
 				status: backendResponse.status,
 			});
-
 		} catch (error) {
 			console.error("[PROXY]", "Error during proxy request:", {
-				error: error instanceof Error ? {
-					message: error.message,
-					name: error.name,
-					stack: error.stack,
-					cause: error.cause
-				} : error,
+				error:
+					error instanceof Error
+						? {
+								message: error.message,
+								name: error.name,
+								stack: error.stack,
+								cause: error.cause,
+							}
+						: error,
 				url: remoteUrl.href,
 				method: request.method,
-				headers: Object.fromEntries(remoteHeaders as any)
+				headers: Object.fromEntries(remoteHeaders as any),
 			});
-			
+
 			// Return error response to client
 			return new NextResponse(
 				JSON.stringify({
 					error: "Proxy request failed",
 					message: error instanceof Error ? error.message : "Unknown error",
-					url: remoteUrl.href
+					url: remoteUrl.href,
 				}),
 				{
 					status: 502,
 					headers: {
-						"Content-Type": "application/json"
-					}
-				}
+						"Content-Type": "application/json",
+					},
+				},
 			);
 		}
-	}
-
-
+	};
 };
