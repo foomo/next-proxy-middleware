@@ -1,5 +1,5 @@
-import type { NextRequest } from 'next/server';
-import { NextResponse } from 'next/server';
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 
 /**
  * Configuration options for the development proxy middleware.
@@ -235,11 +235,11 @@ export type DevProxyConfig = {
  */
 export const createProxyMiddleware = (config: DevProxyConfig) => {
 	if (config.debug) {
-		console.debug('[PROXY]', 'starting proxy with config', config);
+		console.debug("[PROXY]", "starting proxy with config", config);
 	}
 
 	if (config.remoteUrl === undefined) {
-		throw new Error('remoteUrl is required');
+		throw new Error("remoteUrl is required");
 	}
 
 	return async (request: NextRequest) => {
@@ -248,7 +248,7 @@ export const createProxyMiddleware = (config: DevProxyConfig) => {
 		}
 
 		const remoteUrl = new URL(
-			typeof config.remoteUrl === 'function'
+			typeof config.remoteUrl === "function"
 				? config.remoteUrl(request)
 				: config.remoteUrl,
 		);
@@ -257,23 +257,23 @@ export const createProxyMiddleware = (config: DevProxyConfig) => {
 
 		// Prepare request headers for the backend
 		const preparedRequestHeaders = new Headers(request.headers);
-		preparedRequestHeaders.set('host', remoteUrl.host);
+		preparedRequestHeaders.set("host", remoteUrl.host);
 
 		if (config.basicAuth) {
-			preparedRequestHeaders.set('Authorization', config.basicAuth.authHeader);
+			preparedRequestHeaders.set("Authorization", config.basicAuth.authHeader);
 		}
 
 		// Disable compression for proxy (compressed responses can cause parsing issues)
-		preparedRequestHeaders.delete('accept-encoding');
+		preparedRequestHeaders.delete("accept-encoding");
 
 		// Add Cloudflare Access Token headers if configured
 		if (config.cfTokenAuth) {
 			preparedRequestHeaders.set(
-				'CF-Access-Client-Id',
+				"CF-Access-Client-Id",
 				config.cfTokenAuth.clientId,
 			);
 			preparedRequestHeaders.set(
-				'CF-Access-Client-Secret',
+				"CF-Access-Client-Secret",
 				config.cfTokenAuth.clientSecret,
 			);
 		}
@@ -285,11 +285,11 @@ export const createProxyMiddleware = (config: DevProxyConfig) => {
 
 		if (config.debug) {
 			console.debug(
-				'[PROXY]',
-				'rewriteRequest cookies:',
-				finalRequestHeaders.get('cookie'),
+				"[PROXY]",
+				"rewriteRequest cookies:",
+				finalRequestHeaders.get("cookie"),
 			);
-			console.debug('[PROXY]', 'Preparing fetch request:', {
+			console.debug("[PROXY]", "Preparing fetch request:", {
 				url: remoteUrl.href,
 				method: request.method,
 				headers: Object.fromEntries(finalRequestHeaders as any),
@@ -308,7 +308,7 @@ export const createProxyMiddleware = (config: DevProxyConfig) => {
 			const duration = performance.now() - startTime;
 
 			console.log(
-				'[PROXY]',
+				"[PROXY]",
 				request.method,
 				`${request.nextUrl.pathname} => ${remoteUrl.href}`,
 				backendResponse.status,
@@ -316,7 +316,7 @@ export const createProxyMiddleware = (config: DevProxyConfig) => {
 			);
 
 			if (config.debug) {
-				console.debug('[PROXY]', 'received response from remote', {
+				console.debug("[PROXY]", "received response from remote", {
 					headers: Object.fromEntries(backendResponse.headers as any),
 				});
 			}
@@ -326,9 +326,9 @@ export const createProxyMiddleware = (config: DevProxyConfig) => {
 
 			if (config.debug) {
 				console.debug(
-					'[PROXY]',
-					'rewriteResponse cookies:',
-					backendResponse.headers.get('set-cookie'),
+					"[PROXY]",
+					"rewriteResponse cookies:",
+					backendResponse.headers.get("set-cookie"),
 				);
 			}
 
@@ -340,14 +340,14 @@ export const createProxyMiddleware = (config: DevProxyConfig) => {
 					try {
 						if (config.debug) {
 							console.debug(
-								'[PROXY]',
-								'original set-cookie headers:',
+								"[PROXY]",
+								"original set-cookie headers:",
 								setCookieHeaders,
 							);
 						}
 
 						// Clear existing set-cookie headers and add rewritten ones
-						preparedResponseHeaders.delete('set-cookie');
+						preparedResponseHeaders.delete("set-cookie");
 
 						for (const cookie of setCookieHeaders) {
 							// Replace Domain attribute while preserving all other attributes
@@ -358,20 +358,20 @@ export const createProxyMiddleware = (config: DevProxyConfig) => {
 									`Domain=${config.overrideCookieDomain}`,
 								)
 								// Change SameSite=Strict to SameSite=None for cross-origin dev
-								.replace(/SameSite=Strict/gi, 'SameSite=None');
+								.replace(/SameSite=Strict/gi, "SameSite=None");
 
-							preparedResponseHeaders.append('set-cookie', rewritten);
+							preparedResponseHeaders.append("set-cookie", rewritten);
 						}
 
 						if (config.debug) {
 							console.debug(
-								'[PROXY]',
-								'rewritten cookies:',
+								"[PROXY]",
+								"rewritten cookies:",
 								preparedResponseHeaders.getSetCookie(),
 							);
 						}
 					} catch (e) {
-						console.error('[PROXY] Error rewriting cookies', e);
+						console.error("[PROXY] Error rewriting cookies", e);
 					}
 				}
 			}
@@ -389,7 +389,7 @@ export const createProxyMiddleware = (config: DevProxyConfig) => {
 				status: backendResponse.status,
 			});
 		} catch (error) {
-			console.error('[PROXY]', 'Error during proxy request:', {
+			console.error("[PROXY]", "Error during proxy request:", {
 				error:
 					error instanceof Error
 						? {
@@ -407,14 +407,14 @@ export const createProxyMiddleware = (config: DevProxyConfig) => {
 			// Return error response to client
 			return new NextResponse(
 				JSON.stringify({
-					error: 'Proxy request failed',
-					message: error instanceof Error ? error.message : 'Unknown error',
+					error: "Proxy request failed",
+					message: error instanceof Error ? error.message : "Unknown error",
 					url: remoteUrl.href,
 				}),
 				{
 					status: 502,
 					headers: {
-						'Content-Type': 'application/json',
+						"Content-Type": "application/json",
 					},
 				},
 			);
