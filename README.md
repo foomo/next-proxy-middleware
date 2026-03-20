@@ -32,8 +32,6 @@ export type DevProxyConfig = {
   debug?: boolean; // Enable debug logging
   disable?: boolean; // Disable the proxy entirely
   remoteUrl: string | ((request: NextRequest) => string); // Remote URL or function to generate it
-  allowResponseCompression?: boolean; // Allow response compression (default: false)
-  overrideHostHeader?: boolean; // Override host header (default: true)
   overrideCookieDomain?: false | string; // Domain to use for cookies or false to disable
   basicAuth?: {
     authHeader: string; // Authorization header value
@@ -42,6 +40,14 @@ export type DevProxyConfig = {
     clientId: string;
     clientSecret: string;
   };
+  rewriteRequestHeaders?: (
+    originalRequest: Headers,
+    preparedHeaders: Headers
+  ) => Headers;
+  rewriteResponseHeaders?: (
+    backendResponse: Headers,
+    preparedHeaders: Headers
+  ) => Headers;
 };
 ```
 
@@ -60,8 +66,10 @@ const proxyConfig: DevProxyConfig = {
   basicAuth: {
     authHeader: "Basic abc123==",
   },
-  overrideCookieDomain: "example.com",
+  overrideCookieDomain: "localhost",
 };
+
+const proxyMiddleware = createProxyMiddleware(proxyConfig);
 
 export function middleware(request: NextRequest) {
   if (request.nextUrl.pathname.match("^/(api|webhooks)/")) {
@@ -73,8 +81,29 @@ export function middleware(request: NextRequest) {
 export const config = {
   matcher: ["/api/:path*"],
 };
+```
 
-const proxyMiddleware = createProxyMiddleware(proxyConfig);
+### Header Customization
+
+You can customize request and response headers using the `rewriteRequestHeaders` and `rewriteResponseHeaders` hooks:
+
+```typescript
+const proxyConfig: DevProxyConfig = {
+  remoteUrl: "https://api.example.com",
+  overrideCookieDomain: "localhost",
+
+  // Modify headers before sending to backend
+  rewriteRequestHeaders: (originalRequest, preparedHeaders) => {
+    preparedHeaders.set("X-Custom-Header", "value");
+    return preparedHeaders;
+  },
+
+  // Modify headers before sending to client
+  rewriteResponseHeaders: (backendResponse, preparedHeaders) => {
+    preparedHeaders.set("Access-Control-Allow-Origin", "http://localhost:3000");
+    return preparedHeaders;
+  },
+};
 ```
 
 ## Contributing
@@ -85,4 +114,4 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 Distributed under MIT License, please see license file within the code for more details.
 
-_Made with ♥ [foomo](https://www.foomo.org) by [bestbytes](https://www.bestbytes.com)_
+_Made with love by [foomo](https://www.foomo.org) at [bestbytes](https://www.bestbytes.com)_
